@@ -1,6 +1,6 @@
 import { ForExp, AppExp, Exp, Program,makeAppExp,makeProcExp, isForExp,isDefineExp, makeDefineExp, isNumExp, makeNumExp, makeForExp, makeVarDecl, CExp, NumExp } from "./L21-ast";
 import { Result, makeFailure, makeOk } from "../imp/result";
-import { reduce } from "ramda";
+import { reduce, map } from "ramda";
 
 /*
 Purpose: @TODO
@@ -10,17 +10,18 @@ Type: @TODO
 
 
 export const for2app = (exp: ForExp): AppExp =>{
-    // const body =reduce((acc: CExp[],cur: NumExp) => cur.val<=exp.end.val
-    // ? acc.concat([exp.body],cur) :acc ,[]);
-    // var body=[exp.body].concat(makeNumExp(exp.start.val));
-    // for(var i=exp.start.val+1;i<=exp.end.val;i++){
-    //     body=body.concat(exp.body).concat(makeNumExp(i));
-    // }
-    // return makeAppExp(makeProcExp([],[makeProcExp([exp.var],[exp.body]),exp.start]),[]);
-    // return makeAppExp(makeProcExp([],[makeProcExp([],[exp.body])]),[]);
-    var bod=exp.body;
-    return makeAppExp(makeProcExp([],[makeAppExp( makeProcExp([exp.var], loop(exp,exp.start.val+1,[bod].concat(exp.start) ) ),[] )]),[]);
+    
+    
+    // return makeAppExp ( makeAppExp( makeProcExp([], lambdaLoop(exp.start.val,exp,[]) ) ,/*numberLoop(exp.start.val,exp.end.val,[])*/ [] ),[] );
+
+    const full= map(n=> makeAppExp( makeProcExp([exp.var],[exp.body]) ,[n] ), numberLoop(exp.start.val,exp.end.val,[]));
+
+    return makeAppExp(makeProcExp([],full),[]);
 }
+
+export const numberLoop = (start: number, end: number, rands: CExp[]): CExp[] =>
+    (start<=end) ? rands.concat(makeNumExp(start)).concat(numberLoop(start+1,end,[])) :
+    rands;
 
 export const loop = (exp : ForExp, num: number,body: CExp[]): CExp[] => 
     num>exp.end.val ? body :

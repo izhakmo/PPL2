@@ -212,8 +212,10 @@ const praseGoodForExp = (params : Sexp[]): Result<ForExp> =>{
     const start=parseL21Exp(params[1]);
     const end=parseL21Exp(params[2]);
     const body=parseL21Exp(params[3]);
+
+    // isOk(dec) ? console.log(dec.value.tag+"shit son ") : console.log();
     return ( isOk(dec) && isOk(start) && isOk(end) && isOk(body) )?
-    (isIdentifier(dec.value) && isNumExp(start.value) && isNumExp(end.value) && isCExp(body.value) )?
+    (isIdentifier(dec.value) && isNumExp(start.value) && isNumExp(end.value) && isCExp(body.value) && start.value<=end.value )?
      makeOk(makeForExp(makeVarDecl(dec.value),start.value,end.value,body.value)) :
      makeFailure("damn1") :makeFailure("damn2");
 

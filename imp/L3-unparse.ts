@@ -11,7 +11,7 @@ export const unparseL3 = (exp: Exp | Program): Result<string> =>
     isVarRef(exp) ? makeOk(exp.var) :
     isPrimOp(exp) ? makeOk(exp.op) :
     isLitExp(exp) ? makeOk(valueToString(exp.val)) :
-    isDefineExp(exp) ? bind(unparseL3(exp.val), (val: string) => makeOk(`(define ${exp.var} ${val})`)) :
+    isDefineExp(exp) ? bind(unparseL3(exp.val), (val: string) => makeOk(`(define ${exp.var.var} ${val})`)) :
     isProcExp(exp) ? bind(mapResult(unparseL3, exp.body), (body: string[]) => makeOk(`(lambda (${map(v => v.var, exp.args).join(" ")} ${body.join(" ")}))`)) :
     isIfExp(exp) ? safe3((test: string, then: string, alt: string) => makeOk(`(if ${test} ${then} ${alt})`))
                     (unparseL3(exp.test), unparseL3(exp.then), unparseL3(exp.alt)) :

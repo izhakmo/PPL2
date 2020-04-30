@@ -8,13 +8,14 @@ Signature: @TODO
 Type: @TODO
 */
 export const l2ToJS = (exp: Exp | Program): Result<string> => 
-    isProgram(exp) ? bind(mapResult(l2ToJS, exp.exps), (exps: string[]) => makeOk(exps.join(";\n"))) :
+    isProgram(exp) ? bind(mapResult(l2ToJS, exp.exps), (exps: string[]) => makeOk(ProgramToJs(exps))) :
     isBoolExp(exp) ? makeOk(exp.val ? "#t" : "#f") :
     isNumExp(exp) ? makeOk(exp.val.toString()) :
     isVarRef(exp) ? makeOk(exp.var) :
     isPrimOp(exp) ? makeOk(primToJs(exp)) :
     isDefineExp(exp) ? bind(l2ToJS(exp.val), (val: string) => makeOk(`const ${exp.var.var} = ${val}`)) :
-    isProcExp(exp) ? bind(mapResult(l2ToJS, exp.body), (body: string[]) => makeOk(`((${map(v => v.var, exp.args).join(",")}) => ${procToJsStart(exp)}${body.join(procToJsdots(exp)+" "+procToJsreturn(exp))}${procToJsEnd(exp)})`)) :
+    isProcExp(exp) ? bind(mapResult(l2ToJS, exp.body), (body: string[]) => 
+        makeOk(`((${map(v => v.var, exp.args).join(",")}) => ${proctoJsConvert(body)})`)) :
     isIfExp(exp) ? safe3((test: string, then: string, alt: string) => makeOk(`(${test} ? ${then} : ${alt})`))
                     (l2ToJS(exp.test), l2ToJS(exp.then), l2ToJS(exp.alt)) :
     isAppExp(exp) ? safe2((rator: string, rands: string[]) => makeOk(appToJs(exp,rator,rands)))
@@ -29,20 +30,17 @@ export const primToJs = (exp: PrimOp) : string =>
     (exp.op=="=") ? "===" :
     exp.op;
 
-export const procToJsStart = (exp: ProcExp) : string =>
-    (exp.body.length>1) ?"{" :"" ;
-
-export const procToJsEnd = (exp: ProcExp) : string =>
-    (exp.body.length>1) ?";}" :"" ;
-
-export const procToJsdots = (exp: ProcExp) : string =>
-    (exp.body.length>1) ?";" :"" ;
-
-export const procToJsreturn = (exp: ProcExp) : string =>
-(exp.body.length>1 ) ?"" :"" ;
-
-
 export const appToJs = (exp: AppExp, rator: string, rands: string[]) : string =>
     (exp.rator.tag=="PrimOp") ?
     ((rator!="!") ?`(${rands.join(" "+rator.toString()+" ")})` : `(!${rands[0]})`) :
     `${rator}(${rands.join(",")})` ;
+
+
+export const proctoJsConvert = (body: string[]) : string =>
+        (body.length ===1) ? body[0] :
+        ("{"+body.slice(0,body.length-1).join("; ")+"; return "+body[body.length-1]+";}");
+
+
+export const ProgramToJs = (exp: string[]) : string =>
+        (exp.length===1) ? exp[0] :
+        (exp.slice(0,exp.length-1).join(";\n")+";\nconsole.log("+exp[exp.length-1]+");");

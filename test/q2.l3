@@ -6,13 +6,13 @@
 
 (define power
    (lambda (n1 n2)
-      (if (= 0 n2) 1 (powerZero n1 n2) )
+      (if (= 0 n2) 1 (powerNotZero n1 n2) )
    )
 )
 
-(define powerZero
+(define powerNotZero
     (lambda (n1 n2)
-      (if (= 1 n2)  n1  (* n1 (power n1 (- n2 1))))
+      (if (= 1 n2)  n1  (* n1 (powerNotZero n1 (- n2 1))))
     )
 )
 

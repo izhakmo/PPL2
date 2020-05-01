@@ -214,7 +214,7 @@ const praseGoodForExp = (params : Sexp[]): Result<ForExp> =>{
     const body=parseL21Exp(params[3]);
 
     return ( isOk(dec) && isOk(start) && isOk(end) && isOk(body) )?
-    (isVarRef(dec.value) && isNumExp(start.value) && isNumExp(end.value) && isCExp(body.value) && start.value<=end.value )?
+    (isVarRef(dec.value) && isNumExp(start.value) && isNumExp(end.value) && isCExp(body.value) && start.value.val<=end.value.val )?
      makeOk(makeForExp(makeVarDecl(dec.value.var),start.value,end.value,body.value)) :
      makeFailure("damn1") :makeFailure("damn2");
 

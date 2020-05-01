@@ -9,7 +9,7 @@ Type: @TODO
 */
 export const l2ToJS = (exp: Exp | Program): Result<string> => 
     isProgram(exp) ? bind(mapResult(l2ToJS, exp.exps), (exps: string[]) => makeOk(ProgramToJs(exps))) :
-    isBoolExp(exp) ? makeOk(exp.val ? "#t" : "#f") :
+    isBoolExp(exp) ? makeOk(exp.val ? "true" : "false") :
     isNumExp(exp) ? makeOk(exp.val.toString()) :
     isVarRef(exp) ? makeOk(exp.var) :
     isPrimOp(exp) ? makeOk(primToJs(exp)) :
@@ -27,12 +27,13 @@ export const primToJs = (exp: PrimOp) : string =>
     (exp.op=="not") ? "!" :
     (exp.op=="and") ? "&&" :
     (exp.op=="or") ? "||" :
-    (exp.op=="=") ? "===" :
+    (exp.op=="=" ||exp.op=="eq?") ? "===" :
     exp.op;
 
 export const appToJs = (exp: AppExp, rator: string, rands: string[]) : string =>
     (exp.rator.tag=="PrimOp") ?
-    ((rator!="!") ?`(${rands.join(" "+rator.toString()+" ")})` : `(!${rands[0]})`) :
+    ((rator==="!") ?`(!${rands[0]})` : (rator==="boolean?") ? `(typeof ${rands[0]} === "boolean")` :
+      (rator==="number?") ? `(typeof ${rands[0]} === "number")` : `(${rands.join(" "+rator.toString()+" ")})` ) :
     `${rator}(${rands.join(",")})` ;
 
 

@@ -3,9 +3,9 @@ import { Result, makeFailure, makeOk } from "../imp/result";
 import { reduce, map } from "ramda";
 
 /*
-Purpose: @TODO
-Signature: @TODO
-Type: @TODO
+Purpose: Convert ForExp to AppExp
+Signature: for2app(forExp)
+Type: [ForExp] => [AppExp]
 */
 
 
@@ -14,8 +14,9 @@ export const for2app = (exp: ForExp): AppExp =>{
     const full= map(n=> makeAppExp( makeProcExp([exp.var],[exp.body]) ,[n] ), numberLoop(exp.start.val,exp.end.val,[]));
     return makeAppExp(makeProcExp([],full),[]);
 
-    // makeAppExp(makeProcExp([],map(n=> makeAppExp( makeProcExp([exp.var],[exp.body]) ,[n] ), numberLoop(exp.start.val,exp.end.val,[]))),[]);
 }
+
+
 
 export const numberLoop = (start: number, end: number, rands: CExp[]): CExp[] =>
     (start<=end) ? rands.concat(makeNumExp(start)).concat(numberLoop(start+1,end,[])) :
@@ -23,11 +24,10 @@ export const numberLoop = (start: number, end: number, rands: CExp[]): CExp[] =>
 
 
 
-
 /*
-Purpose: @TODO
-Signature: @TODO
-Type: @TODO
+Purpose: Convert L21 AST to L2 AST
+Signature: L21ToL2(exp)
+Type: [Exp | Program] => [Result<Exp | Program>]
 */
 export const L21ToL2 = (exp: Exp | Program): Result<Exp | Program> =>
     isProgram(exp) ? makeOk( makeProgram(map(rewrite, exp.exps)) ):

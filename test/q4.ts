@@ -3,9 +3,9 @@ import { Result, makeOk, makeFailure,bind,safe2,safe3,mapResult } from '../imp/r
 import { map } from "ramda";
 
 /*
-Purpose: @TODO
-Signature: @TODO
-Type: @TODO
+Purpose: Convert L2 AST to an equivalent string of a JS program
+Signature: l2ToJS(exp)
+Type: [[Exp | Program ] => [Result<string>]]
 */
 export const l2ToJS = (exp: Exp | Program): Result<string> => 
     isProgram(exp) ? bind(mapResult(l2ToJS, exp.exps), (exps: string[]) => makeOk(ProgramToJs(exps))) :
